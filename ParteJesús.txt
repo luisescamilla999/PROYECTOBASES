@@ -33,8 +33,8 @@ SubTotal DECIMAL (13,2) NOT NULL,
 ImporteExonerado DECIMAL (13,2) NULL ,
 ImporteExento DECIMAL (13,2) NULL,
 ImporteGravado15 DECIMAL (13,2) NULL,
-ISV_15 DECIMAL CHECK (ISV_15=0.15) NULL,
-ISV_18 DECIMAL CHECK (ISV_18=0.18) NULL,
+ISV_15 DECIMAL (13,2) NULL,
+ISV_18 DECIMAL (13,2) NULL,
 TotalPagar DECIMAL (13,2) NOT NULL,
 FechaLímiteEmisión DATE NOT NULL,
 Id_NúmeroAsignado INTEGER FOREIGN KEY REFERENCES NúmerosAsignado(Id_NúmeroAsignado),
@@ -48,7 +48,7 @@ CREATE TABLE DetallesFactura(
 Id_Detalle INTEGER PRIMARY KEY,
 PorcentajeDescuento DECIMAL (2,2) NULL,
 Total DECIMAL (13,2) NOT NULL,
-DescuentoTerceraEdad DECIMAL CHECK (DescuentoTerceraEdad=0.5) NULL,
+DescuentoTerceraEdad DECIMAL (13,2) NULL,
 Id_Factura INTEGER FOREIGN KEY REFERENCES Facturas(Id_Factura)
 );
 
@@ -60,4 +60,32 @@ FOREIGN KEY (Id_Servicio) REFERENCES Servicios(Id_Servicio),  --- Referencia tab
 CONSTRAINT PK_Conjuntos PRIMARY KEY (Id_Detalle, Id_Servicio)
 );
 
+CREATE TABLE TipoServicios(
+Id_TipoServicio INTEGER PRIMARY KEY,
+Nombre VARCHAR (150) NOT NULL
+);
+
+CREATE TABLE Suscripciones(
+Id_Suscripción INTEGER PRIMARY KEY,
+NombreSuscripción VARCHAR (100) NOT NULL,
+Descripción VARCHAR (150) NOT NULL,
+Precio DECIMAL (13,2) NOT NULL,
+FechaInscripción DATE NOT NULL,
+FechaFinalización DATE NOT NULL
+);
+
+CREATE TABLE Servicios (
+Id_Servicio INTEGER PRIMARY KEY,
+Nombre VARCHAR (200) NOT NULL,
+CantidadHoras VARCHAR (50) NOT NULL,
+Id_TipoServicio INTEGER FOREIGN KEY REFERENCES TipoServicios(Id_TipoServicio),
+Id_Suscripción INTEGER FOREIGN KEY REFERENCES Suscripciones(Id_Suscripción)
+);
+
+CREATE TABLE --Servicios Tienen suscripciones--(
+Id_Suscripción INTEGER NOT NULL,
+Id_Servicio INTEGER NOT NULL,  
+FOREIGN KEY (Id_Suscripción) REFERENCES Suscripciones(Id_Suscripción),
+FOREIGN KEY (Id_Servicio) REFERENCES Servicios(Id_Servicio), 
+CONSTRAINT PK_--Servicios Tienen suscripciones-- PRIMARY KEY (Id_Suscripción, Id_Servicio)
 
