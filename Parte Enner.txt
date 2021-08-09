@@ -1,60 +1,3 @@
-
-CREATE TABLE Maquinaria(
-      Id_Maquinaria INTEGER NOT NULL PRIMARY KEY,
-	  Id_marca INTEGER NOT NULL,
-	  Id_tipo_maquinaria INTEGER NOT NULL,
-	  Nombre VARCHAR(35) NOT NULL,
-	  Valor_libro DECIMAL(12,2) NOT NULL,
-	  Valor_residual DECIMAL(12,2) NOT NULL,
-	  Depreciasion_anual DECIMAL(12,2),
-	  Descripcion VARCHAR(100),
-	  Cantidad INTEGER NOT NULL,
-	  Codigo INTEGER NOT NULL UNIQUE,
-
---FALTA CONFIGURAR RELACIONES DE LAS FOREING KEY
-	--FOREIGN KEY(Id_marca) REFERENCES Marcas(Id_marca),
-	--FOREIGN KEY(Id_tipo_maquinaria) REFERENCES Tipo_maquinaria(Id_tipo)
-
-);
-
-CREATE TABLE Tipo_maquinaria(
-	  Id_tipo INTEGER NOT NULL PRIMARY KEY,
-	  Nombre VARCHAR(40) NOT NULL UNIQUE 
-);
-
-CREATE TABLE Marcas(
-      Id_marca INTEGER NOT NULL PRIMARY KEY,
-	  Nombre VARCHAR(40) NOT NULL
-);
-
---FALTA CONFIGURAR LAS LLAVES
-CREATE TABLE Contiene(
-	  Id_maquinaria INTEGER NOT NULL,
-	  Id_sucursal INTEGER NOT NULL,
-	  Cantidad_buen_estado INTEGER NOT NULL,
-	  Cantidad_mal_estado INTEGER NOT NULL
-);
-
-CREATE TABLE Sucursales(
-	  Id_sucursal INTEGER NOT NULL PRIMARY KEY,
-	  Nombre VARCHAR(40),
-	  Cantidad_empleados INTEGER NOT NULL,
-
---FALTA CONFIGURAR RELACIONES DE LAS FOREING KEY
-	--Id_direccion INTEGER NOT NULL REFERENCES Direcciones(Id_direccion),
-    --Id_jefe INTEGER NOT NULL REFERENCES Empleado(Id_empleado)
-
-);
-
-CREATE TABLE Direcciones(
-	  Id_direccion INTEGER NOT NULL PRIMARY KEY,
-
---FALTA CONFIGURAR RELACIONES DE LAS FOREING KEY
-	  --Id_departamento INTEGER NOT NULL REFERENCES Departamentos(Id_departamento),
-	  --Id_municipio INTEGER NOT NULL REFERENCES Municipios(Id_municipio),
-	  --Id_colonia INTEGER NOT NULL REFERENCES Colonias(Id_colonia)
-);
-
 CREATE TABLE Departamentos(
 	 Id_departamento INTEGER NOT NULL PRIMARY KEY,
 	 Nombre VARCHAR(40) NOT NULL
@@ -71,4 +14,58 @@ CREATE TABLE Colonias(
 	 N_calle INTEGER NOT NULL,
 	 N_casa INTEGER NOT NULL,
 	 Referencia VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Tipo_maquinaria(
+	  Id_tipo INTEGER NOT NULL PRIMARY KEY,
+	  Nombre VARCHAR(40) NOT NULL UNIQUE 
+);
+
+CREATE TABLE Marcas(
+      Id_marca INTEGER NOT NULL PRIMARY KEY,
+	  Nombre VARCHAR(40) NOT NULL
+);
+
+CREATE TABLE Direcciones(
+	  Id_direccion INTEGER NOT NULL PRIMARY KEY,
+	  Id_departamento INTEGER NOT NULL REFERENCES Departamentos(Id_departamento),
+	  Id_municipio INTEGER NOT NULL REFERENCES Municipios(Id_municipio),
+	  Id_colonia INTEGER NOT NULL REFERENCES Colonias(Id_colonia)
+);
+CREATE TABLE Sucursales(
+	  Id_sucursal INTEGER NOT NULL PRIMARY KEY,
+	  Nombre VARCHAR(40),
+	  Cantidad_empleados INTEGER NOT NULL,
+      Id_direccion INTEGER NOT NULL REFERENCES Direcciones(Id_direccion),
+      Id_jefe INTEGER NOT NULL REFERENCES Empleado(Id_empleado)
+
+);
+CREATE TABLE Proveedores(
+      Id_proveedor INTEGER NOT NULL PRIMARY KEY,
+	  Nombre VARCHAR(40) NOT NULL,
+	  CAI INTEGER NOT NULL,
+	  Telefono VARCHAR(8) NOT NULL,
+	  Direccion INTEGER NOT NULL REFERENCES Direcciones(Id_direccion)
+);
+CREATE TABLE Maquinaria(
+      Id_Maquinaria INTEGER NOT NULL PRIMARY KEY,
+	  Id_marca INTEGER NOT NULL,
+	  Id_tipo_maquinaria INTEGER NOT NULL,
+	  Nombre VARCHAR(35) NOT NULL,
+	  Valor_libro DECIMAL(12,2) NOT NULL,
+	  Valor_residual DECIMAL(12,2) NOT NULL,
+	  Depreciasion_anual DECIMAL(12,2),
+	  Descripcion VARCHAR(100),
+	  Cantidad INTEGER NOT NULL,
+	  Codigo INTEGER NOT NULL UNIQUE,
+	  FOREIGN KEY(Id_marca) REFERENCES Marcas(Id_marca),
+	  FOREIGN KEY(Id_tipo_maquinaria) REFERENCES Tipo_maquinaria(Id_tipo)
+);
+
+
+CREATE TABLE Contiene(
+	  Id_maquinaria INTEGER NOT NULL REFERENCES Maquinaria(Id_Maquinaria),
+	  Id_sucursal INTEGER NOT NULL REFERENCES Sucursales(Id_sucursal),
+	  Cantidad_buen_estado INTEGER NOT NULL,
+	  Cantidad_mal_estado INTEGER NOT NULL
 );
