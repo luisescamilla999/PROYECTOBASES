@@ -16,7 +16,7 @@ Id_Tipo INTEGER FOREIGN KEY REFERENCES TipoDocumentos(Id_Tipo)
 
 CREATE TABLE NúmerosAsignado(
 Id_NúmeroAsignado INTEGER PRIMARY KEY, 
-Id_PuntoEmisión VARCHAR (3) NOT NULL,
+PuntoEmisión VARCHAR (3) NOT NULL,
 Id_Tipo INTEGER FOREIGN KEY REFERENCES TipoDocumentos(Id_Tipo),
 Id_Sucursal INTEGER FOREIGN KEY REFERENCES Sucursales(Id_Sucursal) --- revisar si el id y la tabla están igual ---
 );
@@ -27,7 +27,7 @@ Nombre VARCHAR (100) NOT NULL
 )
 
 CREATE TABLE Facturas(
-Id_Factura INTEGER IDENTITY (1,1),
+Id_Factura INTEGER PRIMARY KEY IDENTITY (1,1),
 FechaEmisión DATE NOT NULL,
 SubTotal DECIMAL (13,2) NOT NULL, 
 ImporteExonerado DECIMAL (13,2) NULL ,
@@ -49,7 +49,7 @@ Id_Detalle INTEGER PRIMARY KEY,
 PorcentajeDescuento DECIMAL (2,2) NULL,
 Total DECIMAL (13,2) NOT NULL,
 DescuentoTerceraEdad DECIMAL CHECK (DescuentoTerceraEdad=0.5) NULL,
-
+Id_Factura INTEGER FOREIGN KEY REFERENCES Facturas(Id_Factura)
 );
 
 CREATE TABLE Conjuntos(
