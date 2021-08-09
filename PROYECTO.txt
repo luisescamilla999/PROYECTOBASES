@@ -1,0 +1,298 @@
+CREATE DATABASE GIMNACIO
+
+USE GIMNACIO
+
+CREATE TABLE Gimnacio(
+	Id_gimnacio INTEGER PRIMARY KEY,
+	Nombre VARCHAR(150) NOT NULL,
+	CAI VARCHAR(50) NOT NULL
+);
+GO
+
+CREATE TABLE MétodoPago(
+	Id_MétodoPago INTEGER PRIMARY KEY,
+	Nombre VARCHAR (100) NOT NULL
+);
+GO
+
+CREATE TABLE TipoDocumentos(
+	Id_Tipo INTEGER PRIMARY KEY,
+	Nombre VARCHAR(50) NOT NULL UNIQUE,
+	Codigo VARCHAR(2) NOT NULL UNIQUE,
+	Habilitado VARCHAR(1) NOT NULL
+);
+GO
+
+CREATE TABLE Rangos(
+Id_Rango INTEGER PRIMARY KEY,
+Inicio VARCHAR(8) NOT NULL,
+Fin VARCHAR(8) NOT NULL,
+Actual VARCHAR(8) NOT NULL,
+Activo VARCHAR(1) NOT NULL,
+Id_Tipo INTEGER FOREIGN KEY REFERENCES TipoDocumentos(Id_Tipo)
+);
+GO
+
+CREATE TABLE Departamentos(
+	Id_departamento INTEGER NOT NULL PRIMARY KEY,
+	Nombre VARCHAR(40) NOT NULL
+);
+GO
+
+CREATE TABLE Municipios(
+	 Id_municipio INTEGER NOT NULL PRIMARY KEY,
+	 Nombre VARCHAR(40) NOT NULL
+);
+GO
+
+CREATE TABLE Colonias(
+	 Id_colonia INTEGER NOT NULL PRIMARY KEY,
+	 Nombre VARCHAR(40) NOT NULL,
+	 N_calle INTEGER NOT NULL,
+	 N_casa INTEGER NOT NULL,
+	 Referencia VARCHAR(100) NOT NULL
+);
+GO
+
+CREATE TABLE Direcciones(
+	  Id_direccion INTEGER NOT NULL PRIMARY KEY,
+	  Id_departamento INTEGER NOT NULL REFERENCES Departamentos(Id_departamento),
+	  Id_municipio INTEGER NOT NULL REFERENCES Municipios(Id_municipio),
+	  Id_colonia INTEGER NOT NULL REFERENCES Colonias(Id_colonia)
+);
+GO
+
+CREATE TABLE PERSONAS(
+Id_persona INTEGER PRIMARY KEY,
+Nombre1 VARCHAR(60) NOT NULL,
+Nombre2 VARCHAR(60),
+Apellido1 VARCHAR(60) NOT NULL,
+Apellido2 VARCHAR(60),
+Identidad VARCHAR(13) NOT NULL,
+RTN VARCHAR(15),
+Fecha_nacimiento DATE,
+Id_direccion INTEGER REFERENCES Direcciones(Id_direccion)
+);
+
+CREATE TABLE Tipo_maquinaria(
+	  Id_tipo INTEGER NOT NULL PRIMARY KEY,
+	  Nombre VARCHAR(40) NOT NULL UNIQUE 
+);
+GO
+
+CREATE TABLE Marcas(
+      Id_marca INTEGER NOT NULL PRIMARY KEY,
+	  Nombre VARCHAR(40) NOT NULL
+);
+GO
+
+CREATE TABLE Proveedores(
+    Id_proveedor INTEGER NOT NULL PRIMARY KEY,
+	Nombre VARCHAR(40) NOT NULL,
+	CAI INTEGER NOT NULL,
+	Telefono VARCHAR(8) NOT NULL,
+	Direccion INTEGER NOT NULL REFERENCES Direcciones(Id_direccion)
+);
+
+CREATE TABLE Maquinaria(
+    Id_Maquinaria INTEGER NOT NULL PRIMARY KEY,
+	Id_marca INTEGER NOT NULL,
+	Id_tipo_maquinaria INTEGER NOT NULL,
+	Nombre VARCHAR(35) NOT NULL,
+	Valor_libro DECIMAL(12,2) NOT NULL,
+	Valor_residual DECIMAL(12,2) NOT NULL,
+	Depreciasion_anual DECIMAL(12,2),
+	Descripcion VARCHAR(100),
+	Cantidad INTEGER NOT NULL,
+	Codigo INTEGER NOT NULL UNIQUE,
+	Id_proveedor INTEGER NOT NULL REFERENCES Proveedores(Id_proveedor),
+	FOREIGN KEY(Id_marca) REFERENCES Marcas(Id_marca),
+	FOREIGN KEY(Id_tipo_maquinaria) REFERENCES Tipo_maquinaria(Id_tipo)
+);
+GO
+
+CREATE TABLE Salario(
+	Id_salario INTEGER PRIMARY KEY,
+	Salario_neto DECIMAL(14,4),
+);
+GO
+
+CREATE TABLE Dias(
+	Id_dia INTEGER PRIMARY KEY,
+	Nombre VARCHAR(50) NOT NULL UNIQUE
+);
+GO
+
+CREATE TABLE Horas_Extra(
+	Id_horas_estra INTEGER IDENTITY(1,1) PRIMARY KEY,
+	Cantidad_horas INTEGER NOT NULL,
+	Cantidad_por_hora DECIMAL(13,4) NOT NULL,
+	Id_salario INTEGER REFERENCES Salario(Id_salario)
+);
+GO
+
+CREATE TABLE Tipo_Movimiento(
+	Id_tipo INTEGER PRIMARY KEY,
+	Razon VARCHAR(300) NOT NULL,
+	CANTIDAD DECIMAL(13,4) NOT NULL,
+	Factor INTEGER NOT NULL
+);
+GO
+
+CREATE TABLE Jornadas(
+	Id_jornada INTEGER PRIMARY KEY,
+	Hora_inicio TIME NOT NULL,
+	Hora_final TIME NOT NULL,
+	Id_dias INTEGER REFERENCES Dias(Id_dia)
+);
+GO
+
+CREATE TABLE Movimiento_Salario(
+	Id_movimiento INTEGER PRIMARY KEY,
+	Descripcion VARCHAR(500),
+	Id_tipo_movimiento INTEGER REFERENCES Tipo_Movimiento(Id_tipo)
+);
+GO
+
+CREATE TABLE Pagos_Movimiento(
+	Id_salario INTEGER REFERENCES Salario(Id_salario),
+	Id_movimiento INTEGER REFERENCES Movimiento_Salario(Id_movimiento),
+	PRIMARY KEY(Id_salario,Id_movimiento)
+);
+GO
+
+CREATE TABLE Cargo(
+	Id_cargo INTEGER PRIMARY KEY,
+	Nombre VARCHAR(150) NOT NULL,
+	Id_salario INTEGER REFERENCES Salario(Id_salario)
+);
+GO
+
+CREATE TABLE Areas_Rrhh(
+	Id_area INTEGER PRIMARY KEY,
+	Nombre VARCHAR(100) NOT NULL
+);
+GO
+
+CREATE TABLE Sucursales(
+	Id_sucursal INTEGER NOT NULL PRIMARY KEY,
+	Nombre VARCHAR(40),
+	Cantidad_empleados INTEGER NOT NULL,
+    Id_direccion INTEGER NOT NULL REFERENCES Direcciones(Id_direccion),
+	Id_gimnacio INTEGER REFERENCES Gimnacio(Id_gimnacio)
+);
+GO
+
+
+CREATE TABLE Contiene(
+	  Id_maquinaria INTEGER NOT NULL REFERENCES Maquinaria(Id_Maquinaria),
+	  Id_sucursal INTEGER NOT NULL REFERENCES Sucursales(Id_sucursal),
+	  Cantidad_buen_estado INTEGER NOT NULL,
+	  Cantidad_mal_estado INTEGER NOT NULL,
+	  PRIMARY KEY(Id_maquinaria,Id_sucursal)
+);
+GO
+
+CREATE TABLE Empleados(
+	Id_empleado INTEGER PRIMARY KEY,
+	Id_cargo INTEGER NOT NULL REFERENCES Cargo(Id_cargo),
+	Id_sucursal INTEGER NOT NULL REFERENCES Sucursales(Id_sucursal),
+	Id_jornada INTEGER REFERENCES Jornadas(Id_jornada),
+	Id_area_rrhh INTEGER NOT NULL REFERENCES Areas_Rrhh(Id_area)
+);
+GO
+
+CREATE TABLE IMPRENTA(
+	Id_imprenta INTEGER PRIMARY KEY,
+	Codigo VARCHAR(3) NOT NULL UNIQUE,
+	CAI VARCHAR(16) NOT NULL UNIQUE,
+	Id_gimnacio INTEGER NOT NULL REFERENCES Gimnacio(Id_gimnacio)
+);
+GO
+
+CREATE TABLE NúmerosAsignado(
+	Id_NúmeroAsignado INTEGER PRIMARY KEY, 
+	Id_PuntoEmisión VARCHAR (3) NOT NULL,
+	Id_Tipo INTEGER FOREIGN KEY REFERENCES TipoDocumentos(Id_Tipo),
+	Id_Sucursal INTEGER FOREIGN KEY REFERENCES Sucursales(Id_sucursal),
+	Id_imprenta INTEGER REFERENCES IMPRENTA(Id_imprenta)
+);
+
+ALTER TABLE Sucursales ADD Id_empleado_jefe INTEGER REFERENCES Empleados(Id_empleado);
+
+CREATE TABLE Facturas(
+	Id_Factura INTEGER IDENTITY (1,1) PRIMARY KEY,
+	FechaEmisión DATE NOT NULL,
+	SubTotal DECIMAL (13,2) NOT NULL, 
+	ImporteExonerado DECIMAL (13,2) NULL ,
+	ImporteExento DECIMAL (13,2) NULL,
+	ImporteGravado15 DECIMAL (13,2) NULL,
+	ISV_15 DECIMAL CHECK (ISV_15=0.15) NULL,
+	ISV_18 DECIMAL CHECK (ISV_18=0.18) NULL,
+	TotalPagar DECIMAL (13,2) NOT NULL,
+	FechaLímiteEmisión DATE NOT NULL,
+	Id_NúmeroAsignado INTEGER FOREIGN KEY REFERENCES NúmerosAsignado(Id_NúmeroAsignado),
+	Id_MétodoPago INTEGER FOREIGN KEY REFERENCES MétodoPago(Id_MétodoPago),
+	Id_Gimnasio INTEGER FOREIGN KEY REFERENCES Gimnacio(Id_gimnacio),
+	Id_Empleado INTEGER FOREIGN KEY REFERENCES Empleados(Id_empleado),
+	Id_Persona INTEGER FOREIGN KEY REFERENCES Personas(Id_Persona)
+);
+GO
+
+CREATE TABLE DetallesFactura(
+	Id_Detalle INTEGER PRIMARY KEY,
+	PorcentajeDescuento DECIMAL (2,2) NULL,
+	Total DECIMAL (13,2) NOT NULL,
+	DescuentoTerceraEdad DECIMAL CHECK (DescuentoTerceraEdad=0.5) NULL,
+	Id_Factura INTEGER FOREIGN KEY REFERENCES Facturas(Id_Factura)
+);
+GO
+
+CREATE TABLE TipoServicios(
+	Id_TipoServicio INTEGER PRIMARY KEY,
+	Nombre VARCHAR (150) NOT NULL
+);
+GO
+
+CREATE TABLE Suscripciones(
+	Id_Suscripción INTEGER PRIMARY KEY,
+	NombreSuscripción VARCHAR (100) NOT NULL,
+	Descripción VARCHAR (150) NOT NULL,
+	Precio DECIMAL (13,2) NOT NULL,
+	FechaInscripción DATE NOT NULL,
+	FechaFinalización DATE NOT NULL
+);
+GO
+
+CREATE TABLE Usuarios(
+	Id_usuario INTEGER PRIMARY KEY,
+	Id_persona INTEGER UNIQUE NOT NULL REFERENCES Personas(Id_persona),
+	Id_suscripcion INTEGER REFERENCES Suscripciones(Id_Suscripción)
+);
+GO
+
+CREATE TABLE Servicios (
+	Id_Servicio INTEGER PRIMARY KEY,
+	Nombre VARCHAR (200) NOT NULL,
+	CantidadHoras VARCHAR (50) NOT NULL,
+	Id_TipoServicio INTEGER FOREIGN KEY REFERENCES TipoServicios(Id_TipoServicio),
+	Id_Suscripción INTEGER FOREIGN KEY REFERENCES Suscripciones(Id_Suscripción)
+);
+
+CREATE TABLE Tienen(
+	Id_Suscripción INTEGER NOT NULL,
+	Id_Servicio INTEGER NOT NULL,  
+	FOREIGN KEY (Id_Suscripción) REFERENCES Suscripciones(Id_Suscripción),
+	FOREIGN KEY (Id_Servicio) REFERENCES Servicios(Id_Servicio), 
+	CONSTRAINT PK_Tienen PRIMARY KEY (Id_Suscripción, Id_Servicio)
+);
+GO
+
+CREATE TABLE Conjuntos(
+	Id_Detalle INTEGER NOT NULL,
+	Id_Servicio INTEGER NOT NULL,  
+	FOREIGN KEY (Id_Detalle) REFERENCES DetallesFactura(Id_Detalle),
+	FOREIGN KEY (Id_Servicio) REFERENCES Servicios(Id_Servicio), 
+	CONSTRAINT PK_Conjuntos PRIMARY KEY (Id_Detalle, Id_Servicio)
+);
+GO
