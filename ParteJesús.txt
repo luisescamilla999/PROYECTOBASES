@@ -1,0 +1,63 @@
+CREATE TABLE TipoDocumentos(
+Id_Tipo INTEGER PRIMARY KEY,
+Nombre VARCHAR(50) NOT NULL UNIQUE,
+Codigo VARCHAR(2) NOT NULL UNIQUE,
+Habilitado VARCHAR(1) NOT NULL
+);
+
+CREATE TABLE Rangos(
+Id_Rango INTEGER PRIMARY KEY,
+Inicio VARCHAR(8) NOT NULL,
+Fin VARCHAR(8) NOT NULL,
+Actual VARCHAR(8) NOT NULL,
+Activo VARCHAR(1) NOT NULL,
+Id_Tipo INTEGER FOREIGN KEY REFERENCES TipoDocumentos(Id_Tipo)
+);
+
+CREATE TABLE NúmerosAsignado(
+Id_NúmeroAsignado INTEGER PRIMARY KEY, 
+Id_PuntoEmisión VARCHAR (3) NOT NULL,
+Id_Tipo INTEGER FOREIGN KEY REFERENCES TipoDocumentos(Id_Tipo),
+Id_Sucursal INTEGER FOREIGN KEY REFERENCES Sucursales(Id_Sucursal) --- revisar si el id y la tabla están igual ---
+);
+
+CREATE TABLE MétodoPago(
+Id_MétodoPago INTEGER PRIMARY KEY,
+Nombre VARCHAR (100) NOT NULL
+)
+
+CREATE TABLE Facturas(
+Id_Factura INTEGER IDENTITY (1,1),
+FechaEmisión DATE NOT NULL,
+SubTotal DECIMAL (13,2) NOT NULL, 
+ImporteExonerado DECIMAL (13,2) NULL ,
+ImporteExento DECIMAL (13,2) NULL,
+ImporteGravado15 DECIMAL (13,2) NULL,
+ISV_15 DECIMAL CHECK (ISV_15=0.15) NULL,
+ISV_18 DECIMAL CHECK (ISV_18=0.18) NULL,
+TotalPagar DECIMAL (13,2) NOT NULL,
+FechaLímiteEmisión DATE NOT NULL,
+Id_NúmeroAsignado INTEGER FOREIGN KEY REFERENCES NúmerosAsignado(Id_NúmeroAsignado),
+Id_MétodoPago INTEGER FOREIGN KEY REFERENCES MétodoPago(Id_MétodoPago),
+Id_Gimnasio INTEGER FOREIGN KEY REFERENCES Gimnasios(Id_Gimnasio),   ----Revisar que los id y nombre de tabla concuerden (Gimnasio, empleado, persona)----
+Id_Empleado INTEGER FOREIGN KEY REFERENCES Empleados(Id_Empleado),
+Id_Persona INTEGER FOREIGN KEY REFERENCES Personas(Id_Persona),
+);
+
+CREATE TABLE DetallesFactura(
+Id_Detalle INTEGER PRIMARY KEY,
+PorcentajeDescuento DECIMAL (2,2) NULL,
+Total DECIMAL (13,2) NOT NULL,
+DescuentoTerceraEdad DECIMAL CHECK (DescuentoTerceraEdad=0.5) NULL,
+
+);
+
+CREATE TABLE Conjuntos(
+Id_Detalle INTEGER NOT NULL,
+Id_Servicio INTEGER NOT NULL,  
+FOREIGN KEY (Id_Detalle) REFERENCES DetallesFactura(Id_Detalle),
+FOREIGN KEY (Id_Servicio) REFERENCES Servicios(Id_Servicio),  --- Referencia tabla servicios---
+CONSTRAINT PK_Conjuntos PRIMARY KEY (Id_Detalle, Id_Servicio)
+);
+
+
